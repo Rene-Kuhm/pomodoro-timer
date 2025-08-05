@@ -32,7 +32,27 @@ Agrega estas dos URIs en tu Spotify Dashboard:
    - Agrega ambas URIs de redirección mencionadas arriba
    - Guarda los cambios
 
-### 5. Funcionalidades Disponibles
+### 5. Configuración de Variables de Entorno en Vercel
+
+**IMPORTANTE**: Para que Spotify funcione en producción, debes configurar las variables de entorno en Vercel:
+
+1. Ve a tu proyecto en [Vercel Dashboard](https://vercel.com/dashboard)
+2. Selecciona tu proyecto "pomodoro-timer"
+3. Ve a **Settings** → **Environment Variables**
+4. Agrega la siguiente variable:
+   - **Name**: `VITE_SPOTIFY_CLIENT_ID`
+   - **Value**: `tu_client_id_aqui` (tu Client ID de Spotify)
+   - **Environment**: Selecciona **Production**, **Preview**, y **Development**
+5. Haz clic en **Save**
+6. **Redeploy** tu aplicación para que los cambios tomen efecto
+
+#### Verificar la Configuración
+
+Puedes verificar que las variables estén configuradas correctamente:
+- En desarrollo: La aplicación debería funcionar en `https://localhost:5173/`
+- En producción: Abre la consola del navegador en `https://pomodoro-timer-psi-one.vercel.app/` y verifica que no haya errores de "CLIENT_ID undefined"
+
+### 6. Funcionalidades Disponibles
 - ✅ Autenticación OAuth automática
 - ✅ Detección automática de entorno (desarrollo/producción)
 - ✅ Búsqueda de música
@@ -42,7 +62,7 @@ Agrega estas dos URIs en tu Spotify Dashboard:
 - ✅ Gestión de tokens con expiración
 - ✅ Callback handling con React Router
 
-### 6. Flujo de Autenticación
+### 7. Flujo de Autenticación
 1. Usuario hace clic en "Conectar con Spotify"
 2. Redirección a Spotify para autorización
 3. Spotify redirige a `/callback` con el token
@@ -50,7 +70,7 @@ Agrega estas dos URIs en tu Spotify Dashboard:
 5. Usuario regresa a la aplicación principal
 6. Aplicación usa el token para hacer requests a la API
 
-### 7. Estructura de Archivos
+### 8. Estructura de Archivos
 - `src/SpotifyPlayer.tsx` - Componente principal de Spotify
 - `src/SpotifyCallback.tsx` - Manejo del callback de autenticación
 - `src/main.tsx` - Configuración de rutas con React Router
