@@ -41,18 +41,18 @@ const SpotifyPlayer: React.FC<SpotifyPlayerProps> = ({ isActive, onTrackChange }
   // Spotify App credentials (you'll need to register your app)
   const CLIENT_ID = import.meta.env.VITE_SPOTIFY_CLIENT_ID || '30c4052242ce4567a2df72cffd6b9159';
   
+  // Detect environment and set appropriate redirect URI
+  const isProduction = window.location.hostname !== 'localhost';
+  const REDIRECT_URI = isProduction 
+    ? 'https://pomodoro-timer-psi-one.vercel.app/callback'
+    : 'https://localhost:5173/callback';
+  
   // Debug logging for production troubleshooting
   console.log('Spotify Debug Info:');
   console.log('CLIENT_ID:', CLIENT_ID);
   console.log('Environment:', isProduction ? 'production' : 'development');
   console.log('Redirect URI:', REDIRECT_URI);
   console.log('VITE_SPOTIFY_CLIENT_ID env var:', import.meta.env.VITE_SPOTIFY_CLIENT_ID);
-  
-  // Detect environment and set appropriate redirect URI
-  const isProduction = window.location.hostname !== 'localhost';
-  const REDIRECT_URI = isProduction 
-    ? 'https://pomodoro-timer-psi-one.vercel.app/callback'
-    : 'https://localhost:5173/callback';
   
   const SCOPES = 'user-read-private user-read-email playlist-read-private user-library-read';
 
