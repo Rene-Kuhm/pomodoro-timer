@@ -4,40 +4,6 @@ import { useNavigate } from 'react-router-dom';
 const SpotifyCallback: React.FC = () => {
   const navigate = useNavigate();
 
-  useEffect(() => {
-    // Debug logging
-    console.log('SpotifyCallback - Full URL:', window.location.href);
-    console.log('SpotifyCallback - Hash:', window.location.hash);
-    console.log('SpotifyCallback - Search:', window.location.search);
-    
-    // Extract the authorization code from URL search params (not hash)
-    const urlParams = new URLSearchParams(window.location.search);
-    const code = urlParams.get('code');
-    const error = urlParams.get('error');
-    
-    console.log('SpotifyCallback - Parsed params:', {
-      code: code ? 'found' : 'not found',
-      error,
-      allParams: Object.fromEntries(urlParams.entries())
-    });
-    
-    if (error) {
-      console.error('Spotify authorization error:', error);
-      navigate('/');
-      return;
-    }
-    
-    if (code) {
-      // Exchange authorization code for access token
-      exchangeCodeForToken(code);
-    } else {
-      // Handle error case
-      console.error('No authorization code found in callback');
-      console.error('Available URL parameters:', Object.fromEntries(urlParams.entries()));
-      navigate('/');
-    }
-  }, [navigate, exchangeCodeForToken]);
-
   const exchangeCodeForToken = useCallback(async (code: string) => {
     try {
       const clientId = import.meta.env.VITE_SPOTIFY_CLIENT_ID;
@@ -90,6 +56,40 @@ const SpotifyCallback: React.FC = () => {
       navigate('/');
     }
   }, [navigate]);
+
+  useEffect(() => {
+    // Debug logging
+    console.log('SpotifyCallback - Full URL:', window.location.href);
+    console.log('SpotifyCallback - Hash:', window.location.hash);
+    console.log('SpotifyCallback - Search:', window.location.search);
+    
+    // Extract the authorization code from URL search params (not hash)
+    const urlParams = new URLSearchParams(window.location.search);
+    const code = urlParams.get('code');
+    const error = urlParams.get('error');
+    
+    console.log('SpotifyCallback - Parsed params:', {
+      code: code ? 'found' : 'not found',
+      error,
+      allParams: Object.fromEntries(urlParams.entries())
+    });
+    
+    if (error) {
+      console.error('Spotify authorization error:', error);
+      navigate('/');
+      return;
+    }
+    
+    if (code) {
+      // Exchange authorization code for access token
+      exchangeCodeForToken(code);
+    } else {
+      // Handle error case
+      console.error('No authorization code found in callback');
+      console.error('Available URL parameters:', Object.fromEntries(urlParams.entries()));
+      navigate('/');
+    }
+  }, [navigate, exchangeCodeForToken]);
 
   return (
     <div style={{
