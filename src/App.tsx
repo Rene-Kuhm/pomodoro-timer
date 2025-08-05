@@ -5,8 +5,9 @@ import MusicPlayer from './SpotifyPlayer';
 interface MusicTrack {
   id: string;
   name: string;
-  station: string;
+  artist: string;
   url: string;
+  cover?: string;
 }
 
 interface PomodoroState {
@@ -239,7 +240,6 @@ function App() {
       {state.musicEnabled && (
         <div className="music-player-overlay">
           <MusicPlayer
-            isActive={state.isActive}
             onTrackChange={handleTrackChange}
           />
         </div>
