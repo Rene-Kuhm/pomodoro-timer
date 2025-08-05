@@ -64,9 +64,10 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ isActive, onTrackChange }) =>
 
       if (response.ok) {
         const data = await response.json();
-        const tracks = data.items
-          .map((item: SpotifyPlaylistItem) => item.track)
-          .filter((track: SpotifyTrack) => track && track.preview_url);
+        const allTracks = data.items.map((item: SpotifyPlaylistItem) => item.track);
+        const tracks = allTracks.filter((track: SpotifyTrack) => track && track.preview_url);
+        
+        console.log(`Playlist cargada: ${allTracks.length} canciones totales, ${tracks.length} con vista previa disponible`);
         
         if (tracks.length > 0) {
           const randomTrack = tracks[Math.floor(Math.random() * tracks.length)];
@@ -122,7 +123,10 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ isActive, onTrackChange }) =>
         setIsPlaying(true);
       } catch (error) {
         console.warn('Autoplay blocked:', error);
+        alert('No se pudo reproducir automáticamente. Haz clic en el botón de play para iniciar la reproducción.');
       }
+    } else if (currentTrack && !currentTrack.preview_url) {
+      alert('Esta canción no tiene vista previa disponible. Solo se pueden reproducir clips de 30 segundos sin Spotify Premium.');
     }
   }, [currentTrack]);
 
@@ -359,6 +363,9 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ isActive, onTrackChange }) =>
             ⚙️
           </button>
         </div>
+        <div className="premium-notice">
+          ℹ️ Solo clips de 30 segundos disponibles sin Premium
+        </div>
       </div>
 
       {currentTrack ? (
@@ -374,6 +381,19 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ isActive, onTrackChange }) =>
             <div className="track-details">
               <div className="track-name">{currentTrack.name}</div>
               <div className="track-artist">{currentTrack.artists[0]?.name}</div>
+              {!currentTrack.preview_url && (
+                <div className="no-preview-notice">
+                  Sin vista previa - 
+                  <a 
+                    href={currentTrack.external_urls.spotify} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="spotify-link"
+                  >
+                    Abrir en Spotify
+                  </a>
+                </div>
+              )}
             </div>
           </div>
           
@@ -488,11 +508,22 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ isActive, onTrackChange }) =>
           margin-top: 20px;
         }
         
-        .player-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
+        .player-info {
+           display: flex;
+           justify-content: space-between;
+           align-items: center;
+           margin-bottom: 10px;
+         }
+        
+        .premium-notice {
+          background: rgba(255, 193, 7, 0.2);
+          color: #ffc107;
+          padding: 8px 12px;
+          border-radius: 6px;
+          font-size: 0.85em;
+          text-align: center;
           margin-bottom: 15px;
+          border: 1px solid rgba(255, 193, 7, 0.3);
         }
         
         .player-info {
@@ -557,6 +588,22 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ isActive, onTrackChange }) =>
         .track-artist {
           opacity: 0.8;
           font-size: 0.9em;
+        }
+        
+        .no-preview-notice {
+          color: rgba(255, 193, 7, 0.9);
+          font-size: 0.8em;
+          margin-top: 4px;
+        }
+        
+        .spotify-link {
+          color: #1db954;
+          text-decoration: none;
+          font-weight: 500;
+        }
+        
+        .spotify-link:hover {
+          text-decoration: underline;
         }
         
         .player-controls {
