@@ -40,18 +40,78 @@ interface SpotifyPlaylistItem {
   track: SpotifyTrack;
 }
 
+// Música lofi predeterminada
+const DEFAULT_LOFI_TRACKS = [
+  {
+    id: 'default-1',
+    name: 'Chill Lofi Beat',
+    artists: [{ name: 'Lofi Generator' }],
+    album: {
+      name: 'Study Vibes',
+      images: [{ url: 'https://via.placeholder.com/300x300/6366f1/ffffff?text=🎵' }]
+    },
+    preview_url: 'https://cdn.pixabay.com/audio/2022/05/27/audio_1808fbf07a.mp3',
+    external_urls: { spotify: '' }
+  },
+  {
+    id: 'default-2',
+    name: 'Peaceful Study',
+    artists: [{ name: 'Focus Beats' }],
+    album: {
+      name: 'Concentration',
+      images: [{ url: 'https://via.placeholder.com/300x300/8b5cf6/ffffff?text=🎧' }]
+    },
+    preview_url: 'https://cdn.pixabay.com/audio/2022/03/10/audio_4621777a14.mp3',
+    external_urls: { spotify: '' }
+  },
+  {
+    id: 'default-3',
+    name: 'Ambient Workspace',
+    artists: [{ name: 'Productivity Sounds' }],
+    album: {
+      name: 'Work Flow',
+      images: [{ url: 'https://via.placeholder.com/300x300/ec4899/ffffff?text=🎼' }]
+    },
+    preview_url: 'https://cdn.pixabay.com/audio/2022/01/18/audio_7203346d8a.mp3',
+    external_urls: { spotify: '' }
+  },
+  {
+    id: 'default-4',
+    name: 'Dreamy Lofi',
+    artists: [{ name: 'Chill Vibes' }],
+    album: {
+      name: 'Relaxation',
+      images: [{ url: 'https://via.placeholder.com/300x300/f59e0b/ffffff?text=🌙' }]
+    },
+    preview_url: 'https://cdn.pixabay.com/audio/2021/08/04/audio_0625c1539c.mp3',
+    external_urls: { spotify: '' }
+  },
+  {
+    id: 'default-5',
+    name: 'Coffee Shop Vibes',
+    artists: [{ name: 'Study Music' }],
+    album: {
+      name: 'Focus Time',
+      images: [{ url: 'https://via.placeholder.com/300x300/10b981/ffffff?text=☕' }]
+    },
+    preview_url: 'https://cdn.pixabay.com/audio/2022/08/02/audio_884fe92c21.mp3',
+    external_urls: { spotify: '' }
+  }
+];
+
 const MusicPlayer: React.FC<MusicPlayerProps> = ({ isActive, onTrackChange }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [currentTrack, setCurrentTrack] = useState<SpotifyTrack | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [volume, setVolume] = useState(0.7);
+  const [volume, setVolume] = useState(0.5);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<SpotifyTrack[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
   const [playlists, setPlaylists] = useState<SpotifyPlaylist[]>([]);
   const [showSearch, setShowSearch] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const [showMusicModal, setShowMusicModal] = useState(false);
+  const [useDefaultMusic, setUseDefaultMusic] = useState(true);
   const audioRef = useRef<HTMLAudioElement>(null);
   const nativeAudioRef = useRef<HTMLAudioElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -289,6 +349,34 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ isActive, onTrackChange }) =>
     }
   }, [isActive, currentTrack, playTrack, pauseTrack]);
 
+  // Función para cargar música predeterminada
+  const loadDefaultMusic = useCallback(() => {
+    const randomTrack = DEFAULT_LOFI_TRACKS[Math.floor(Math.random() * DEFAULT_LOFI_TRACKS.length)];
+    setCurrentTrack(randomTrack);
+    onTrackChange({
+      id: randomTrack.id,
+      name: randomTrack.name,
+      station: 'Música Lofi Predeterminada',
+      url: randomTrack.preview_url || ''
+    });
+    setUseDefaultMusic(true);
+    setShowMusicModal(false);
+    
+    // Reproducir automáticamente
+    setTimeout(() => {
+      if (audioRef.current) {
+        audioRef.current.play().catch(console.error);
+      }
+    }, 100);
+  }, [onTrackChange]);
+
+  // Cargar música predeterminada automáticamente al montar el componente
+  useEffect(() => {
+    if (!isAuthenticated && !currentTrack && useDefaultMusic) {
+      loadDefaultMusic();
+    }
+  }, [isAuthenticated, currentTrack, useDefaultMusic, loadDefaultMusic]);
+
   // Generar code_verifier y code_challenge para PKCE
   const generateCodeVerifier = () => {
     const array = new Uint8Array(32);
@@ -437,8 +525,6 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ isActive, onTrackChange }) =>
     setShowMusicModal(false);
   }, []);
 
-
-
   const togglePlayPause = () => {
     if (isPlaying) {
       pauseTrack();
@@ -457,16 +543,22 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ isActive, onTrackChange }) =>
     onTrackChange(null);
   };
 
-  if (!isAuthenticated) {
+  if (!isAuthenticated && !useDefaultMusic) {
     return (
       <div className="spotify-auth">
         <div className="auth-container">
-          <h3>🎵 Conectar con Spotify</h3>
-          <p>Accede a millones de canciones para tu sesión Pomodoro</p>
-          <button className="spotify-login-btn" onClick={authenticateSpotify}>
-            <span>🎧</span>
-            Conectar con Spotify
-          </button>
+          <h3>🎵 Reproductor de Música</h3>
+          <p>Elige tu opción de música para tu sesión Pomodoro</p>
+          <div className="music-options">
+            <button className="default-music-btn" onClick={loadDefaultMusic}>
+              <span>🎧</span>
+              Música Lofi Predeterminada
+            </button>
+            <button className="spotify-login-btn" onClick={authenticateSpotify}>
+              <span>🎵</span>
+              Conectar con Spotify
+            </button>
+          </div>
         </div>
         <style>{`
           .spotify-auth {
@@ -486,7 +578,13 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ isActive, onTrackChange }) =>
             opacity: 0.9;
             font-size: 0.9em;
           }
-          .spotify-login-btn {
+          .music-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: center;
+          }
+          .default-music-btn, .spotify-login-btn {
             background: #000;
             color: white;
             border: none;
@@ -499,7 +597,15 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ isActive, onTrackChange }) =>
             display: flex;
             align-items: center;
             gap: 8px;
-            margin: 0 auto;
+            min-width: 200px;
+            justify-content: center;
+          }
+          .default-music-btn {
+            background: #6366f1;
+          }
+          .default-music-btn:hover {
+            background: #4f46e5;
+            transform: translateY(-2px);
           }
           .spotify-login-btn:hover {
             background: #333;
@@ -544,7 +650,13 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ isActive, onTrackChange }) =>
       <div className="player-header">
         <div className="player-info">
           <span className="spotify-badge">🎵 Spotify</span>
-          <button className="music-btn" onClick={() => setShowMusicModal(true)} title="Opciones de Música">
+          <button className="music-btn" onClick={() => {
+            if (!currentTrack && useDefaultMusic) {
+              loadDefaultMusic();
+            } else {
+              setShowMusicModal(true);
+            }
+          }} title="Opciones de Música">
             🎵 Música
           </button>
           <button className="logout-btn" onClick={logout} title="Desconectar">
@@ -697,6 +809,13 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ isActive, onTrackChange }) =>
               <button className="close-btn" onClick={() => setShowMusicModal(false)}>×</button>
             </div>
             <div className="modal-content">
+              <div className="music-option" onClick={loadDefaultMusic}>
+                <div className="option-icon">🎧</div>
+                <div className="option-info">
+                  <h4>Música Lofi Predeterminada</h4>
+                  <p>Reproduce música lofi relajante automáticamente</p>
+                </div>
+              </div>
               <div className="music-option" onClick={handleFileSelect}>
                 <div className="option-icon">📁</div>
                 <div className="option-info">
