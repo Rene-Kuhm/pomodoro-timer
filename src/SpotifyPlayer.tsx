@@ -41,6 +41,11 @@ const SpotifyPlayer: React.FC<SpotifyPlayerProps> = ({ isActive, onTrackChange }
   // Spotify App credentials (you'll need to register your app)
   const CLIENT_ID = import.meta.env.VITE_SPOTIFY_CLIENT_ID || '30c4052242ce4567a2df72cffd6b9159';
   
+  // Debug: Check if environment variable is being read correctly
+  console.log('🔍 Raw env var:', import.meta.env.VITE_SPOTIFY_CLIENT_ID);
+  console.log('🔍 Processed CLIENT_ID:', CLIENT_ID);
+  console.log('🔍 All env vars:', import.meta.env);
+  
   // Detect environment and set appropriate redirect URI
   const isProduction = window.location.hostname !== 'localhost';
   const REDIRECT_URI = isProduction 
