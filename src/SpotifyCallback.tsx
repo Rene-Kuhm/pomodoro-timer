@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const SpotifyCallback: React.FC = () => {
@@ -36,9 +36,9 @@ const SpotifyCallback: React.FC = () => {
       console.error('Available URL parameters:', Object.fromEntries(urlParams.entries()));
       navigate('/');
     }
-  }, [navigate]);
+  }, [navigate, exchangeCodeForToken]);
 
-  const exchangeCodeForToken = async (code: string) => {
+  const exchangeCodeForToken = useCallback(async (code: string) => {
     try {
       const clientId = import.meta.env.VITE_SPOTIFY_CLIENT_ID;
       const redirectUri = import.meta.env.VITE_SPOTIFY_REDIRECT_URI || window.location.origin + '/callback';
@@ -89,7 +89,7 @@ const SpotifyCallback: React.FC = () => {
       console.error('Error during token exchange:', error);
       navigate('/');
     }
-  };
+  }, [navigate]);
 
   return (
     <div style={{
