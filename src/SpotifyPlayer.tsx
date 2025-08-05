@@ -47,7 +47,7 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ isActive, onTrackChange }) =>
         setIsPlaying(false);
       }
     }
-  }, [isActive]);
+  }, [isActive, currentTrack, onTrackChange]);
 
   // Update volume when changed
   useEffect(() => {
