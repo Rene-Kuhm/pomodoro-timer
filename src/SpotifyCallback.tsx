@@ -5,12 +5,31 @@ const SpotifyCallback: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Debug logging
+    console.log('SpotifyCallback - Full URL:', window.location.href);
+    console.log('SpotifyCallback - Hash:', window.location.hash);
+    console.log('SpotifyCallback - Search:', window.location.search);
+    
     // Extract the access token from the URL hash
     const hash = window.location.hash;
     if (hash) {
       const params = new URLSearchParams(hash.substring(1));
       const accessToken = params.get('access_token');
       const expiresIn = params.get('expires_in');
+      const error = params.get('error');
+      
+      console.log('SpotifyCallback - Parsed params:', {
+        accessToken: accessToken ? 'found' : 'not found',
+        expiresIn,
+        error,
+        allParams: Object.fromEntries(params.entries())
+      });
+      
+      if (error) {
+        console.error('Spotify authorization error:', error);
+        navigate('/');
+        return;
+      }
       
       if (accessToken) {
         // Store the token in localStorage
@@ -20,15 +39,18 @@ const SpotifyCallback: React.FC = () => {
           localStorage.setItem('spotify_token_expiration', expirationTime.toString());
         }
         
+        console.log('SpotifyCallback - Token stored successfully');
         // Redirect back to the main app
         navigate('/');
       } else {
         // Handle error case
         console.error('No access token found in callback');
+        console.error('Available URL parameters:', Object.fromEntries(params.entries()));
         navigate('/');
       }
     } else {
       // No hash found, redirect to main app
+      console.log('SpotifyCallback - No hash found in URL');
       navigate('/');
     }
   }, [navigate]);

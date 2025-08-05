@@ -39,7 +39,14 @@ const SpotifyPlayer: React.FC<SpotifyPlayerProps> = ({ isActive, onTrackChange }
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   // Spotify App credentials (you'll need to register your app)
-  const CLIENT_ID = import.meta.env.VITE_SPOTIFY_CLIENT_ID || 'your_spotify_client_id'; // Replace with your actual client ID
+  const CLIENT_ID = import.meta.env.VITE_SPOTIFY_CLIENT_ID || '30c4052242ce4567a2df72cffd6b9159';
+  
+  // Debug logging for production troubleshooting
+  console.log('Spotify Debug Info:');
+  console.log('CLIENT_ID:', CLIENT_ID);
+  console.log('Environment:', isProduction ? 'production' : 'development');
+  console.log('Redirect URI:', REDIRECT_URI);
+  console.log('VITE_SPOTIFY_CLIENT_ID env var:', import.meta.env.VITE_SPOTIFY_CLIENT_ID);
   
   // Detect environment and set appropriate redirect URI
   const isProduction = window.location.hostname !== 'localhost';
