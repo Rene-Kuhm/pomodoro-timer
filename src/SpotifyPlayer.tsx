@@ -39,12 +39,18 @@ const SpotifyPlayer: React.FC<SpotifyPlayerProps> = ({ isActive, onTrackChange }
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   // Spotify App credentials (you'll need to register your app)
-  const CLIENT_ID = import.meta.env.VITE_SPOTIFY_CLIENT_ID || '30c4052242ce4567a2df72cffd6b9159';
+  const rawClientId = import.meta.env.VITE_SPOTIFY_CLIENT_ID || '30c4052242ce4567a2df72cffd6b9159';
+  
+  // Fix: Extract only the actual client ID value if it contains the variable name
+  const CLIENT_ID = rawClientId.includes('=') 
+    ? rawClientId.split('=').pop() || '30c4052242ce4567a2df72cffd6b9159'
+    : rawClientId;
   
   // Debug: Check if environment variable is being read correctly
   console.log('🔍 Raw env var:', import.meta.env.VITE_SPOTIFY_CLIENT_ID);
-  console.log('🔍 Processed CLIENT_ID:', CLIENT_ID);
-  console.log('🔍 All env vars:', import.meta.env);
+  console.log('🔍 Raw CLIENT_ID:', rawClientId);
+  console.log('🔍 Cleaned CLIENT_ID:', CLIENT_ID);
+  console.log('🔍 CLIENT_ID is valid:', CLIENT_ID.length === 32 && !CLIENT_ID.includes('VITE_'));
   
   // Detect environment and set appropriate redirect URI
   const isProduction = window.location.hostname !== 'localhost';
@@ -66,7 +72,13 @@ const SpotifyPlayer: React.FC<SpotifyPlayerProps> = ({ isActive, onTrackChange }
     console.log('🔍 Authenticating with Spotify...');
     console.log('CLIENT_ID being used:', CLIENT_ID);
     console.log('CLIENT_ID length:', CLIENT_ID.length);
-    console.log('Is CLIENT_ID valid?', CLIENT_ID !== 'your_spotify_client_id' && CLIENT_ID.length > 10);
+    console.log('Is CLIENT_ID valid?', CLIENT_ID.length === 32 && !CLIENT_ID.includes('VITE_'));
+    
+    // Validate CLIENT_ID before proceeding
+    if (CLIENT_ID === 'your_spotify_client_id' || CLIENT_ID.includes('VITE_') || CLIENT_ID.length !== 32) {
+      alert('⚠️ Error: CLIENT_ID no configurado correctamente.\n\nPor favor configura las variables de entorno en Vercel:\n1. Ve a Vercel Dashboard\n2. Settings → Environment Variables\n3. Agrega VITE_SPOTIFY_CLIENT_ID=30c4052242ce4567a2df72cffd6b9159');
+      return;
+    }
     
     const authUrl = `https://accounts.spotify.com/authorize?` +
       `client_id=${CLIENT_ID}&` +
@@ -75,11 +87,7 @@ const SpotifyPlayer: React.FC<SpotifyPlayerProps> = ({ isActive, onTrackChange }
       `scope=${encodeURIComponent(SCOPES)}`;
     
     console.log('🔗 Auth URL:', authUrl);
-    
-    if (CLIENT_ID === 'your_spotify_client_id' || CLIENT_ID.includes('VITE_SPOTIFY_CLIENT_ID')) {
-      alert('⚠️ Error: CLIENT_ID no configurado correctamente.\n\nPor favor configura las variables de entorno en Vercel:\n1. Ve a Vercel Dashboard\n2. Settings → Environment Variables\n3. Agrega VITE_SPOTIFY_CLIENT_ID=30c4052242ce4567a2df72cffd6b9159');
-      return;
-    }
+    console.log('🔗 Expected format: client_id=30c4052242ce4567a2df72cffd6b9159');
     
     window.location.href = authUrl;
   };
