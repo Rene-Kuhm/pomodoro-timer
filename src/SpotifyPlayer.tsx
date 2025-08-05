@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 
 interface MusicPlayerProps {
   isActive: boolean;
@@ -36,6 +36,10 @@ interface SpotifyPlaylist {
   images: Array<{ url: string }>;
 }
 
+interface SpotifyPlaylistItem {
+  track: SpotifyTrack;
+}
+
 const MusicPlayer: React.FC<MusicPlayerProps> = ({ isActive, onTrackChange }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [accessToken, setAccessToken] = useState<string | null>(null);
@@ -66,7 +70,7 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ isActive, onTrackChange }) =>
         localStorage.removeItem('spotify_token_expiration');
       }
     }
-  }, []);
+  }, [loadUserPlaylists]);
 
   // Configurar volumen del audio
   useEffect(() => {
@@ -82,7 +86,7 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ isActive, onTrackChange }) =>
     } else {
       pauseTrack();
     }
-  }, [isActive, currentTrack]);
+  }, [isActive, currentTrack, playTrack, pauseTrack]);
 
   const authenticateSpotify = () => {
     const clientId = import.meta.env.VITE_SPOTIFY_CLIENT_ID;
@@ -108,7 +112,7 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ isActive, onTrackChange }) =>
     window.location.href = authUrl;
   };
 
-  const loadUserPlaylists = async (token: string) => {
+  const loadUserPlaylists = useCallback(async (token: string) => {
     try {
       setIsLoading(true);
       const response = await fetch('https://api.spotify.com/v1/me/playlists?limit=20', {
@@ -137,7 +141,7 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ isActive, onTrackChange }) =>
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
   const loadPlaylistTracks = async (token: string, playlistId: string) => {
     try {
@@ -150,7 +154,7 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ isActive, onTrackChange }) =>
       if (response.ok) {
         const data = await response.json();
         const tracks = data.items
-          .map((item: any) => item.track)
+          .map((item: SpotifyPlaylistItem) => item.track)
           .filter((track: SpotifyTrack) => track && track.preview_url);
         
         if (tracks.length > 0) {
@@ -213,7 +217,7 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ isActive, onTrackChange }) =>
     });
   };
 
-  const playTrack = async () => {
+  const playTrack = useCallback(async () => {
     if (audioRef.current && currentTrack?.preview_url) {
       try {
         await audioRef.current.play();
@@ -222,14 +226,14 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ isActive, onTrackChange }) =>
         console.warn('Autoplay blocked:', error);
       }
     }
-  };
+  }, [currentTrack]);
 
-  const pauseTrack = () => {
+  const pauseTrack = useCallback(() => {
     if (audioRef.current) {
       audioRef.current.pause();
       setIsPlaying(false);
     }
-  };
+  }, []);
 
   const togglePlayPause = () => {
     if (isPlaying) {

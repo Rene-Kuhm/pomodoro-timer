@@ -103,7 +103,7 @@ function App() {
     }));
   };
 
-  const handleTrackChange = (track: MusicTrack) => {
+  const handleTrackChange = (track: MusicTrack | null) => {
     setState(prev => ({
       ...prev,
       currentTrack: track
