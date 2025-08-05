@@ -203,6 +203,45 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ isActive, onTrackChange }) =>
     }
   }, [loadUserPlaylists]);
 
+  const searchLofiTracks = useCallback(async () => {
+    if (!accessToken) return;
+
+    try {
+      setIsLoading(true);
+      const lofiQueries = [
+        'lofi hip hop chill',
+        'lofi study music',
+        'chill beats',
+        'ambient lofi',
+        'relaxing instrumental'
+      ];
+      
+      const randomQuery = lofiQueries[Math.floor(Math.random() * lofiQueries.length)];
+      
+      const response = await fetch(
+        `https://api.spotify.com/v1/search?q=${encodeURIComponent(randomQuery)}&type=track&limit=20`,
+        {
+          headers: {
+            'Authorization': `Bearer ${accessToken}`
+          }
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        const tracksWithPreview = data.tracks.items.filter(
+          (track: SpotifyTrack) => track.preview_url
+        );
+        setSearchResults(tracksWithPreview);
+        console.log(`Encontradas ${tracksWithPreview.length} canciones lofi con vista previa`);
+      }
+    } catch (error) {
+      console.error('Error searching lofi tracks:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [accessToken]);
+
   // Buscar música lofi automáticamente cuando se autentica
   useEffect(() => {
     if (isAuthenticated && accessToken && searchResults.length === 0) {
@@ -281,45 +320,6 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ isActive, onTrackChange }) =>
   };
 
 
-
-  const searchLofiTracks = useCallback(async () => {
-    if (!accessToken) return;
-
-    try {
-      setIsLoading(true);
-      const lofiQueries = [
-        'lofi hip hop chill',
-        'lofi study music',
-        'chill beats',
-        'ambient lofi',
-        'relaxing instrumental'
-      ];
-      
-      const randomQuery = lofiQueries[Math.floor(Math.random() * lofiQueries.length)];
-      
-      const response = await fetch(
-        `https://api.spotify.com/v1/search?q=${encodeURIComponent(randomQuery)}&type=track&limit=20`,
-        {
-          headers: {
-            'Authorization': `Bearer ${accessToken}`
-          }
-        }
-      );
-
-      if (response.ok) {
-        const data = await response.json();
-        const tracksWithPreview = data.tracks.items.filter(
-          (track: SpotifyTrack) => track.preview_url
-        );
-        setSearchResults(tracksWithPreview);
-        console.log(`Encontradas ${tracksWithPreview.length} canciones lofi con vista previa`);
-      }
-    } catch (error) {
-      console.error('Error searching lofi tracks:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [accessToken]);
 
   const searchTracks = async (query: string) => {
     if (!accessToken) {
