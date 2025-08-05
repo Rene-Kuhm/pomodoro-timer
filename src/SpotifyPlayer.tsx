@@ -78,12 +78,18 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ isActive, onTrackChange }) =>
             station: randomTrack.artists[0]?.name || 'Spotify',
             url: randomTrack.preview_url || ''
           });
+        } else {
+          // Si no hay canciones con preview en la playlist, buscar canciones individuales
+          console.log('No se encontraron canciones con preview en la playlist, buscando canciones individuales...');
+          searchLofiTracks();
         }
       }
     } catch (error) {
       console.error('Error loading playlist tracks:', error);
+      // Si falla cargar la playlist, buscar canciones individuales
+      searchLofiTracks();
     }
-  }, [onTrackChange]);
+  }, [onTrackChange, searchLofiTracks]);
 
   const searchLofiPlaylists = useCallback(async (token: string) => {
     try {
@@ -234,13 +240,26 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ isActive, onTrackChange }) =>
         );
         setSearchResults(tracksWithPreview);
         console.log(`Encontradas ${tracksWithPreview.length} canciones lofi con vista previa`);
+        
+        // Seleccionar automáticamente una canción si se encontraron resultados
+        if (tracksWithPreview.length > 0 && !currentTrack) {
+          const randomTrack = tracksWithPreview[Math.floor(Math.random() * tracksWithPreview.length)];
+          setCurrentTrack(randomTrack);
+          onTrackChange({
+            id: randomTrack.id,
+            name: randomTrack.name,
+            station: randomTrack.artists[0]?.name || 'Spotify',
+            url: randomTrack.preview_url || ''
+          });
+          console.log(`Canción seleccionada automáticamente: ${randomTrack.name} - ${randomTrack.artists[0]?.name}`);
+        }
       }
     } catch (error) {
       console.error('Error searching lofi tracks:', error);
     } finally {
       setIsLoading(false);
     }
-  }, [accessToken]);
+  }, [accessToken, currentTrack, onTrackChange]);
 
   // Buscar música lofi automáticamente cuando se autentica
   useEffect(() => {
