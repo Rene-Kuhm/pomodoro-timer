@@ -168,7 +168,27 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ isActive, onTrackChange }) =>
     }
   }, [isActive, currentTrack, playTrack, pauseTrack]);
 
-  const authenticateSpotify = () => {
+  // Generar code_verifier y code_challenge para PKCE
+  const generateCodeVerifier = () => {
+    const array = new Uint8Array(32);
+    crypto.getRandomValues(array);
+    return btoa(String.fromCharCode.apply(null, Array.from(array)))
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_')
+      .replace(/=/g, '');
+  };
+
+  const generateCodeChallenge = async (verifier: string) => {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(verifier);
+    const digest = await crypto.subtle.digest('SHA-256', data);
+    return btoa(String.fromCharCode.apply(null, Array.from(new Uint8Array(digest))))
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_')
+      .replace(/=/g, '');
+  };
+
+  const authenticateSpotify = async () => {
     const clientId = import.meta.env.VITE_SPOTIFY_CLIENT_ID;
     const redirectUri = import.meta.env.VITE_SPOTIFY_REDIRECT_URI || window.location.origin + '/callback';
     const scopes = [
@@ -182,11 +202,20 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ isActive, onTrackChange }) =>
       'streaming'
     ].join(' ');
 
+    // Generar PKCE parameters
+    const codeVerifier = generateCodeVerifier();
+    const codeChallenge = await generateCodeChallenge(codeVerifier);
+    
+    // Guardar code_verifier para usar en el callback
+    localStorage.setItem('spotify_code_verifier', codeVerifier);
+
     const authUrl = `https://accounts.spotify.com/authorize?` +
       `client_id=${clientId}&` +
-      `response_type=token&` +
+      `response_type=code&` +
       `redirect_uri=${encodeURIComponent(redirectUri)}&` +
       `scope=${encodeURIComponent(scopes)}&` +
+      `code_challenge_method=S256&` +
+      `code_challenge=${codeChallenge}&` +
       `show_dialog=true`;
 
     window.location.href = authUrl;
