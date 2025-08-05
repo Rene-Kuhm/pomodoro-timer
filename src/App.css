@@ -5,12 +5,12 @@
   --accent-color: #06b6d4;
   --text-light: #ffffff;
   --text-dark: #1e293b;
-  --shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-  --border-radius: 24px;
-  --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  --glass-bg: rgba(255, 255, 255, 0.1);
-  --glass-border: rgba(255, 255, 255, 0.2);
-  --backdrop-blur: blur(20px);
+  --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --border-radius: 12px;
+  --transition: all 0.2s ease;
+  --glass-bg: rgba(255, 255, 255, 0.05);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --backdrop-blur: none;
 }
 
 /* Reset y estilos globales */
@@ -22,46 +22,10 @@
 
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: linear-gradient(135deg, #0f172a 0%, #1e293b 25%, #334155 50%, #475569 75%, #64748b 100%);
+  background: #1e293b;
   min-height: 100vh;
   overflow-x: hidden;
   color: var(--text-light);
-  position: relative;
-}
-
-/* Fondo elegante con ondas suaves */
-body::before {
-  content: '';
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: 
-    radial-gradient(circle at 25% 25%, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
-    radial-gradient(circle at 75% 75%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
-    linear-gradient(135deg, rgba(6, 182, 212, 0.05) 0%, transparent 100%);
-  z-index: -2;
-}
-
-/* Ondas animadas sutiles */
-body::after {
-  content: '';
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 200%;
-  height: 200%;
-  background: 
-    radial-gradient(ellipse 800px 600px at 50% 0%, rgba(99, 102, 241, 0.03) 0%, transparent 50%),
-    radial-gradient(ellipse 600px 800px at 100% 50%, rgba(139, 92, 246, 0.03) 0%, transparent 50%);
-  animation: gentleWaves 20s ease-in-out infinite;
-  z-index: -1;
-}
-
-@keyframes gentleWaves {
-  0%, 100% { transform: translate(-10%, -10%) rotate(0deg); }
-  50% { transform: translate(-5%, -5%) rotate(1deg); }
 }
 
 /* Contenedor principal */
@@ -69,42 +33,6 @@ body::after {
   min-height: 100vh;
   position: relative;
   background: transparent;
-  overflow: hidden;
-}
-
-/* Efectos sutiles de profundidad */
-.app::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: 
-    radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.02) 0%, transparent 40%),
-    radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.02) 0%, transparent 40%),
-    linear-gradient(135deg, rgba(255, 255, 255, 0.01) 0%, transparent 100%);
-  z-index: 1;
-  pointer-events: none;
-}
-
-.app::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: 
-    linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.005) 50%, transparent 70%);
-  animation: subtleShimmer 15s ease-in-out infinite;
-  z-index: 1;
-  pointer-events: none;
-}
-
-@keyframes subtleShimmer {
-  0%, 100% { opacity: 0.3; transform: translateX(-100%); }
-  50% { opacity: 0.7; transform: translateX(100%); }
 }
 
 
@@ -196,13 +124,9 @@ body::after {
   text-shadow: 0 0 40px rgba(255, 255, 255, 0.5);
   margin-bottom: 30px;
   letter-spacing: -0.02em;
-  animation: pulse 2s ease-in-out infinite;
 }
 
-@keyframes pulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.02); }
-}
+/* Animación pulse eliminada para reducir fatiga visual */
 
 .motivational-quote {
   font-size: 18px;
@@ -318,13 +242,9 @@ body::after {
 .start-btn.active {
   background: linear-gradient(135deg, #ef4444, #dc2626);
   box-shadow: 0 0 30px rgba(239, 68, 68, 0.4);
-  animation: activeGlow 2s ease-in-out infinite;
 }
 
-@keyframes activeGlow {
-  0%, 100% { box-shadow: 0 0 20px rgba(255, 107, 107, 0.3); }
-  50% { box-shadow: 0 0 30px rgba(255, 107, 107, 0.6); }
-}
+/* Animación activeGlow eliminada para reducir fatiga visual */
 
 /* Mode selector flotante */
 .floating-mode-selector {
@@ -460,15 +380,11 @@ body::after {
     radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
     radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
     radial-gradient(circle at 40% 40%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
-  animation: particleFloat 20s ease-in-out infinite;
+  /* animation: particleFloat eliminada para reducir fatiga visual */
   pointer-events: none;
 }
 
-@keyframes particleFloat {
-  0%, 100% { transform: translateY(0px) rotate(0deg); }
-  33% { transform: translateY(-10px) rotate(120deg); }
-  66% { transform: translateY(5px) rotate(240deg); }
-}
+/* Animación particleFloat eliminada para reducir fatiga visual */
 
 /* Efectos glassmorphism modernos */
 .neon-overlay {
@@ -507,15 +423,12 @@ body::after {
   background: 
     linear-gradient(45deg, transparent 40%, rgba(139, 92, 246, 0.02) 50%, transparent 60%),
     linear-gradient(-45deg, transparent 40%, rgba(6, 182, 212, 0.02) 50%, transparent 60%);
-  animation: gentleGlow 25s ease-in-out infinite;
+  /* animation: gentleGlow eliminada para reducir fatiga visual */
   pointer-events: none;
   z-index: 0;
 }
 
-@keyframes gentleGlow {
-  0%, 100% { opacity: 0.5; }
-  50% { opacity: 1; }
-}
+/* Animación gentleGlow eliminada para reducir fatiga visual */
 
 /* Responsive design */
 @media (max-width: 768px) {
