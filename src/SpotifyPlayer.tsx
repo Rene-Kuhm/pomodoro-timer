@@ -32,6 +32,8 @@ const RadioPlayer: React.FC<RadioPlayerProps> = ({ isActive, onTrackChange }) =>
       } else {
         audioRef.current.play();
         setIsPlaying(true);
+        // Notify parent component about track change when starting playback
+        onTrackChange?.(currentTrack);
       }
     }
   };
@@ -45,7 +47,11 @@ const RadioPlayer: React.FC<RadioPlayerProps> = ({ isActive, onTrackChange }) =>
   };
 
   // Handle audio events
-  const handleAudioPlay = () => setIsPlaying(true);
+  const handleAudioPlay = () => {
+    setIsPlaying(true);
+    // Notify parent component when audio starts playing
+    onTrackChange?.(currentTrack);
+  };
   const handleAudioPause = () => setIsPlaying(false);
   const handleAudioError = () => {
     console.error('Error loading radio stream');
