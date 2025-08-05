@@ -51,7 +51,10 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ isActive, onTrackChange }) =>
   const [playlists, setPlaylists] = useState<SpotifyPlaylist[]>([]);
   const [showSearch, setShowSearch] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [showMusicModal, setShowMusicModal] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
+  const nativeAudioRef = useRef<HTMLAudioElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Declarar funciones con useCallback antes de usarlas en useEffect
   const searchLofiTracks = useCallback(async () => {
@@ -393,6 +396,49 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ isActive, onTrackChange }) =>
 
 
 
+  // Funciones para reproductor nativo
+  const handleFileSelect = useCallback(() => {
+    fileInputRef.current?.click();
+  }, []);
+
+  const handleFileChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file && file.type.startsWith('audio/')) {
+      const url = URL.createObjectURL(file);
+      if (nativeAudioRef.current) {
+        nativeAudioRef.current.src = url;
+        nativeAudioRef.current.play();
+      }
+      // Actualizar el track actual con el archivo local
+      const localTrack = {
+        id: 'local-' + Date.now(),
+        name: file.name.replace(/\.[^/.]+$/, ''),
+        artists: [{ name: 'Archivo Local' }],
+        album: {
+          name: 'Música Local',
+          images: []
+        },
+        preview_url: url,
+        external_urls: { spotify: '' }
+      };
+      setCurrentTrack(localTrack);
+      onTrackChange({
+        id: localTrack.id,
+        name: localTrack.name,
+        station: 'Reproductor Local',
+        url: url
+      });
+      setShowMusicModal(false);
+    }
+  }, [onTrackChange]);
+
+  const openSpotifyWeb = useCallback(() => {
+    window.open('https://open.spotify.com', '_blank');
+    setShowMusicModal(false);
+  }, []);
+
+
+
   const togglePlayPause = () => {
     if (isPlaying) {
       pauseTrack();
@@ -476,9 +522,31 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ isActive, onTrackChange }) =>
         />
       )}
 
+      {/* Reproductor nativo para archivos locales */}
+      <audio
+        ref={nativeAudioRef}
+        onEnded={() => setIsPlaying(false)}
+        onPlay={() => setIsPlaying(true)}
+        onPause={() => setIsPlaying(false)}
+        controls
+        style={{ display: 'none' }}
+      />
+
+      {/* Input oculto para seleccionar archivos */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="audio/*"
+        onChange={handleFileChange}
+        style={{ display: 'none' }}
+      />
+
       <div className="player-header">
         <div className="player-info">
           <span className="spotify-badge">🎵 Spotify</span>
+          <button className="music-btn" onClick={() => setShowMusicModal(true)} title="Opciones de Música">
+            🎵 Música
+          </button>
           <button className="logout-btn" onClick={logout} title="Desconectar">
             ⚙️
           </button>
@@ -620,6 +688,34 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ isActive, onTrackChange }) =>
         </div>
       )}
 
+      {/* Modal de opciones de música */}
+      {showMusicModal && (
+        <div className="music-modal-overlay" onClick={() => setShowMusicModal(false)}>
+          <div className="music-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>🎵 Opciones de Música</h3>
+              <button className="close-btn" onClick={() => setShowMusicModal(false)}>×</button>
+            </div>
+            <div className="modal-content">
+              <div className="music-option" onClick={handleFileSelect}>
+                <div className="option-icon">📁</div>
+                <div className="option-info">
+                  <h4>Reproductor Local</h4>
+                  <p>Reproduce archivos de música desde tu dispositivo</p>
+                </div>
+              </div>
+              <div className="music-option" onClick={openSpotifyWeb}>
+                <div className="option-icon">🎵</div>
+                <div className="option-info">
+                  <h4>Spotify Web Player</h4>
+                  <p>Abre Spotify en una nueva pestaña</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <style>{`
         .spotify-player {
           background: linear-gradient(135deg, #1db954, #1ed760);
@@ -661,11 +757,27 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ isActive, onTrackChange }) =>
           font-weight: bold;
         }
         
-        .logout-btn {
-          background: rgba(0,0,0,0.3);
+        .music-btn {
+          background: rgba(255,255,255,0.2);
           border: none;
           color: white;
-          padding: 6px 10px;
+          padding: 8px 12px;
+          border-radius: 20px;
+          cursor: pointer;
+          transition: background 0.3s;
+          font-size: 0.9em;
+          margin-right: 10px;
+        }
+        
+        .music-btn:hover {
+          background: rgba(255,255,255,0.3);
+        }
+        
+        .logout-btn {
+          background: rgba(255,255,255,0.2);
+          border: none;
+          color: white;
+          padding: 8px 12px;
           border-radius: 50%;
           cursor: pointer;
           transition: background 0.3s;
@@ -887,6 +999,104 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ isActive, onTrackChange }) =>
           font-size: 0.8em;
           font-weight: bold;
           line-height: 1.2;
+        }
+        
+        .music-modal-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(0, 0, 0, 0.7);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 1000;
+        }
+        
+        .music-modal {
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          border-radius: 15px;
+          padding: 0;
+          max-width: 400px;
+          width: 90%;
+          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+          color: white;
+        }
+        
+        .modal-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 20px;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .modal-header h3 {
+          margin: 0;
+          font-size: 1.2em;
+        }
+        
+        .close-btn {
+          background: none;
+          border: none;
+          color: white;
+          font-size: 1.5em;
+          cursor: pointer;
+          padding: 0;
+          width: 30px;
+          height: 30px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: 50%;
+          transition: background 0.3s;
+        }
+        
+        .close-btn:hover {
+          background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .modal-content {
+          padding: 20px;
+        }
+        
+        .music-option {
+          display: flex;
+          align-items: center;
+          gap: 15px;
+          padding: 15px;
+          border-radius: 10px;
+          cursor: pointer;
+          transition: all 0.3s;
+          margin-bottom: 10px;
+          background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .music-option:hover {
+          background: rgba(255, 255, 255, 0.2);
+          transform: translateY(-2px);
+        }
+        
+        .music-option:last-child {
+          margin-bottom: 0;
+        }
+        
+        .option-icon {
+          font-size: 2em;
+          width: 50px;
+          text-align: center;
+        }
+        
+        .option-info h4 {
+          margin: 0 0 5px 0;
+          font-size: 1.1em;
+        }
+        
+        .option-info p {
+          margin: 0;
+          font-size: 0.9em;
+          opacity: 0.8;
         }
       `}</style>
     </div>
