@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 interface MusicPlayerProps {
   isActive: boolean;
@@ -15,24 +15,79 @@ interface MusicTrack {
 const MusicPlayer: React.FC<MusicPlayerProps> = ({ isActive, onTrackChange }) => {
   const [currentTrack] = useState<MusicTrack>({
     id: 'lofi-hip-hop',
-    name: 'Lofi Hip Hop Radio',
+    name: 'Lofi Hip Hop Stream',
     station: 'Beats to Relax/Study To',
-    url: 'https://www.youtube.com/embed/jfKfPfyJRdk?autoplay=1&mute=0&loop=1&playlist=jfKfPfyJRdk&controls=1&showinfo=0&rel=0&modestbranding=1'
+    url: 'https://stream.zeno.fm/fyn8eh3h5f9uv'
   });
 
-  // Notify parent component about the current track when component mounts
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [volume, setVolume] = useState(0.5);
+  const audioRef = useRef<HTMLAudioElement>(null);
+
+  // Auto-play when component becomes active
   useEffect(() => {
     if (isActive) {
       onTrackChange?.(currentTrack);
+      // Auto-start playing when music is enabled
+      setTimeout(() => {
+        if (audioRef.current) {
+          audioRef.current.play().catch(console.error);
+          setIsPlaying(true);
+        }
+      }, 500);
+    } else {
+      // Stop playing when music is disabled
+      if (audioRef.current) {
+        audioRef.current.pause();
+        setIsPlaying(false);
+      }
     }
   }, [isActive, currentTrack, onTrackChange]);
+
+  // Update volume when changed
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = volume;
+    }
+  }, [volume]);
+
+  const togglePlayPause = () => {
+    if (audioRef.current) {
+      if (isPlaying) {
+        audioRef.current.pause();
+        setIsPlaying(false);
+      } else {
+        audioRef.current.play().catch(console.error);
+        setIsPlaying(true);
+      }
+    }
+  };
+
+  const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newVolume = parseFloat(e.target.value);
+    setVolume(newVolume);
+  };
+
+  const handleAudioError = () => {
+    console.error('Error loading audio stream');
+    setIsPlaying(false);
+  };
 
   if (!isActive) return null;
 
   return (
     <div className="music-player">
       <div className="player-section">
-        <h3>🎵 Lofi Hip Hop YouTube</h3>
+        <h3>🎵 Lofi Hip Hop Stream</h3>
+        
+        {/* Audio Element */}
+        <audio 
+          ref={audioRef}
+          src={currentTrack.url}
+          onError={handleAudioError}
+          loop
+          preload="auto"
+        />
         
         {/* Current Station Display */}
         <div className="current-station">
@@ -43,21 +98,43 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ isActive, onTrackChange }) =>
           </div>
         </div>
         
-        {/* YouTube Iframe Player */}
-        <div className="youtube-player">
-          <iframe 
-            width="100%" 
-            height="150" 
-            src={currentTrack.url}
-            title="lofi hip hop radio" 
-            allow="autoplay; encrypted-media; fullscreen" 
-            allowFullScreen
-            style={{ border: 'none', borderRadius: '8px' }}
-          />
+        {/* Player Controls */}
+        <div className="player-controls">
+          <button 
+            onClick={togglePlayPause}
+            className="play-pause-btn"
+            style={{
+              background: 'none',
+              border: 'none',
+              fontSize: '2rem',
+              cursor: 'pointer',
+              padding: '10px',
+              borderRadius: '50%',
+              backgroundColor: '#f0f0f0',
+              margin: '10px'
+            }}
+          >
+            {isPlaying ? '⏸️' : '▶️'}
+          </button>
+          
+          <div className="volume-control" style={{ margin: '10px' }}>
+            <label>🔊 Volumen: </label>
+            <input 
+              type="range" 
+              min="0" 
+              max="1" 
+              step="0.1" 
+              value={volume}
+              onChange={handleVolumeChange}
+              style={{ marginLeft: '10px' }}
+            />
+            <span style={{ marginLeft: '10px' }}>{Math.round(volume * 100)}%</span>
+          </div>
         </div>
         
         <div className="music-info">
           <p>🎵 Disfruta de música lofi durante tus sesiones de Pomodoro</p>
+          <p style={{ fontSize: '0.8rem', color: '#666' }}>Estado: {isPlaying ? 'Reproduciendo' : 'Pausado'}</p>
         </div>
       </div>
     </div>
