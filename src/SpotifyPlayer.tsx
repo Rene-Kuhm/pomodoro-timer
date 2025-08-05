@@ -85,6 +85,44 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ isActive, onTrackChange }) =>
     }
   }, [onTrackChange]);
 
+  const searchLofiPlaylists = useCallback(async (token: string) => {
+    try {
+      setIsLoading(true);
+      // Buscar playlists públicas de lofi
+      const response = await fetch(
+        `https://api.spotify.com/v1/search?q=lofi%20hip%20hop%20chill%20study&type=playlist&limit=20`,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        const lofiPlaylists = data.playlists.items || [];
+        setPlaylists(lofiPlaylists);
+        
+        // Cargar la primera playlist de lofi encontrada
+        if (lofiPlaylists.length > 0) {
+          const bestLofiPlaylist = lofiPlaylists.find((playlist: SpotifyPlaylist) => 
+            playlist.name.toLowerCase().includes('lofi') ||
+            playlist.name.toLowerCase().includes('chill') ||
+            playlist.name.toLowerCase().includes('study') ||
+            playlist.description?.toLowerCase().includes('lofi')
+          ) || lofiPlaylists[0];
+          
+          console.log(`Cargando playlist de lofi: ${bestLofiPlaylist.name}`);
+          loadPlaylistTracks(token, bestLofiPlaylist.id);
+        }
+      }
+    } catch (error) {
+      console.error('Error searching lofi playlists:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [loadPlaylistTracks]);
+
   const loadUserPlaylists = useCallback(async (token: string) => {
     try {
       setIsLoading(true);
@@ -96,25 +134,34 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ isActive, onTrackChange }) =>
 
       if (response.ok) {
         const data = await response.json();
-        setPlaylists(data.items || []);
+        const userPlaylists = data.items || [];
         
-        // Cargar playlist de concentración por defecto
-        const focusPlaylist = data.items.find((playlist: SpotifyPlaylist) => 
-          playlist.name.toLowerCase().includes('focus') || 
-          playlist.name.toLowerCase().includes('concentra') ||
-          playlist.name.toLowerCase().includes('study')
+        // Buscar playlist de lofi en las playlists del usuario primero
+        const lofiPlaylist = userPlaylists.find((playlist: SpotifyPlaylist) => 
+          playlist.name.toLowerCase().includes('lofi') || 
+          playlist.name.toLowerCase().includes('chill') ||
+          playlist.name.toLowerCase().includes('study') ||
+          playlist.description?.toLowerCase().includes('lofi')
         );
         
-        if (focusPlaylist) {
-          loadPlaylistTracks(token, focusPlaylist.id);
+        if (lofiPlaylist) {
+          setPlaylists(userPlaylists);
+          console.log(`Cargando playlist personal de lofi: ${lofiPlaylist.name}`);
+          loadPlaylistTracks(token, lofiPlaylist.id);
+        } else {
+          // Si no tiene playlists de lofi, buscar playlists públicas
+          console.log('No se encontraron playlists de lofi personales, buscando playlists públicas...');
+          searchLofiPlaylists(token);
         }
       }
     } catch (error) {
       console.error('Error loading playlists:', error);
+      // Si falla cargar playlists del usuario, buscar públicas
+      searchLofiPlaylists(token);
     } finally {
       setIsLoading(false);
     }
-  }, [loadPlaylistTracks]);
+  }, [loadPlaylistTracks, searchLofiPlaylists]);
 
   const playTrack = useCallback(async () => {
     if (audioRef.current && currentTrack?.preview_url) {
@@ -155,6 +202,14 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ isActive, onTrackChange }) =>
       }
     }
   }, [loadUserPlaylists]);
+
+  // Buscar música lofi automáticamente cuando se autentica
+  useEffect(() => {
+    if (isAuthenticated && accessToken && searchResults.length === 0) {
+      console.log('Buscando música lofi automáticamente...');
+      searchLofiTracks();
+    }
+  }, [isAuthenticated, accessToken, searchLofiTracks, searchResults.length]);
 
   // Configurar volumen del audio
   useEffect(() => {
@@ -227,9 +282,54 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ isActive, onTrackChange }) =>
 
 
 
+  const searchLofiTracks = useCallback(async () => {
+    if (!accessToken) return;
+
+    try {
+      setIsLoading(true);
+      const lofiQueries = [
+        'lofi hip hop chill',
+        'lofi study music',
+        'chill beats',
+        'ambient lofi',
+        'relaxing instrumental'
+      ];
+      
+      const randomQuery = lofiQueries[Math.floor(Math.random() * lofiQueries.length)];
+      
+      const response = await fetch(
+        `https://api.spotify.com/v1/search?q=${encodeURIComponent(randomQuery)}&type=track&limit=20`,
+        {
+          headers: {
+            'Authorization': `Bearer ${accessToken}`
+          }
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        const tracksWithPreview = data.tracks.items.filter(
+          (track: SpotifyTrack) => track.preview_url
+        );
+        setSearchResults(tracksWithPreview);
+        console.log(`Encontradas ${tracksWithPreview.length} canciones lofi con vista previa`);
+      }
+    } catch (error) {
+      console.error('Error searching lofi tracks:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [accessToken]);
+
   const searchTracks = async (query: string) => {
-    if (!accessToken || !query.trim()) {
+    if (!accessToken) {
       setSearchResults([]);
+      return;
+    }
+
+    // Si no hay query, buscar música lofi por defecto
+    if (!query.trim()) {
+      searchLofiTracks();
       return;
     }
 
@@ -364,7 +464,7 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ isActive, onTrackChange }) =>
           </button>
         </div>
         <div className="premium-notice">
-          ℹ️ Solo clips de 30 segundos disponibles sin Premium
+          🎵 Música Lofi & Chill - Solo clips de 30 segundos disponibles sin Premium
         </div>
       </div>
 
@@ -421,7 +521,8 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ isActive, onTrackChange }) =>
         </div>
       ) : (
         <div className="no-track">
-          <p>🎵 No hay música seleccionada</p>
+          <p>🎵 Cargando música lofi relajante...</p>
+          {isLoading && <div className="loading">🔄 Buscando las mejores canciones lofi...</div>}
         </div>
       )}
 
@@ -430,14 +531,14 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ isActive, onTrackChange }) =>
           className="search-toggle-btn"
           onClick={() => setShowSearch(!showSearch)}
         >
-          {showSearch ? '❌ Cerrar búsqueda' : '🔍 Buscar música'}
+          {showSearch ? '❌ Cerrar búsqueda' : '🔍 Buscar música lofi'}
         </button>
         
         {showSearch && (
           <div className="search-container">
             <input
               type="text"
-              placeholder="Buscar canciones..."
+              placeholder="Buscar música lofi, chill, study... (vacío = música aleatoria)"
               value={searchQuery}
               onChange={(e) => {
                 setSearchQuery(e.target.value);
@@ -477,7 +578,7 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ isActive, onTrackChange }) =>
 
       {playlists.length > 0 && (
         <div className="playlists-section">
-          <h4>📋 Tus Playlists</h4>
+          <h4>🎵 Playlists Lofi & Chill</h4>
           <div className="playlists-grid">
             {playlists.slice(0, 6).map((playlist) => (
               <div 
