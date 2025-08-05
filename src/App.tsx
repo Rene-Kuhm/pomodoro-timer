@@ -1,14 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './App.css';
-import SpotifyPlayer from './SpotifyPlayer';
+import RadioPlayer from './SpotifyPlayer';
 
-interface SpotifyTrack {
+interface RadioTrack {
   id: string;
   name: string;
-  artists: { name: string }[];
-  album: {
-    images: { url: string }[];
-  };
+  station: string;
+  url: string;
 }
 
 interface PomodoroState {
@@ -18,7 +16,7 @@ interface PomodoroState {
   mode: 'work' | 'shortBreak' | 'longBreak';
   session: number;
   musicEnabled: boolean;
-  currentTrack: SpotifyTrack | null;
+  currentTrack: RadioTrack | null;
 }
 
 const TIMER_MODES = {
@@ -105,7 +103,7 @@ function App() {
     }));
   };
 
-  const handleTrackChange = (track: SpotifyTrack) => {
+  const handleTrackChange = (track: RadioTrack) => {
     setState(prev => ({
       ...prev,
       currentTrack: track
@@ -232,14 +230,14 @@ function App() {
             <button
               className={`music-btn ${state.musicEnabled ? 'active' : ''}`}
               onClick={toggleMusic}
-              title={state.musicEnabled ? 'Desactivar Spotify' : 'Activar Spotify'}
+              title={state.musicEnabled ? 'Desactivar Radio' : 'Activar Radio'}
             >
-              {state.musicEnabled ? '🎵 Spotify ON' : '🔇 Spotify OFF'}
+              {state.musicEnabled ? '📻 Radio ON' : '🔇 Radio OFF'}
             </button>
           </div>
 
           {state.musicEnabled && (
-             <SpotifyPlayer
+             <RadioPlayer
                isActive={state.isActive}
                onTrackChange={handleTrackChange}
              />
