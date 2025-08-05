@@ -56,18 +56,6 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ isActive, onTrackChange }) =>
     }
   }, [volume]);
 
-  const togglePlayPause = () => {
-    if (audioRef.current) {
-      if (isPlaying) {
-        audioRef.current.pause();
-        setIsPlaying(false);
-      } else {
-        audioRef.current.play().catch(console.error);
-        setIsPlaying(true);
-      }
-    }
-  };
-
   const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newVolume = parseFloat(e.target.value);
     setVolume(newVolume);
@@ -106,40 +94,13 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ isActive, onTrackChange }) =>
         {/* Player Controls */}
         <div className="player-controls">
           <button 
-            onClick={togglePlayPause}
-            className="play-pause-btn"
-            style={{
-              background: 'none',
-              border: 'none',
-              fontSize: '2rem',
-              cursor: 'pointer',
-              padding: '10px',
-              borderRadius: '50%',
-              backgroundColor: '#f0f0f0',
-              margin: '10px'
-            }}
-          >
-            {isPlaying ? '⏸️' : '▶️'}
-          </button>
-          
-          <button 
             onClick={() => {
               audioRef.current?.play()
                 .then(() => setIsPlaying(true))
                 .catch(console.error);
             }}
-            style={{
-              background: 'none',
-              border: '2px solid #007bff',
-              color: '#007bff',
-              padding: '8px 16px',
-              borderRadius: '20px',
-              cursor: 'pointer',
-              margin: '10px',
-              fontSize: '0.9rem'
-            }}
           >
-            🎵 Iniciar música
+            Iniciar música manualmente
           </button>
           
           <div className="volume-control" style={{ margin: '10px' }}>
