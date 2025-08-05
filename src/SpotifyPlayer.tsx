@@ -1,19 +1,19 @@
 import React, { useState, useEffect } from 'react';
 
-interface RadioPlayerProps {
+interface MusicPlayerProps {
   isActive: boolean;
-  onTrackChange?: (track: RadioTrack) => void;
+  onTrackChange?: (track: MusicTrack) => void;
 }
 
-interface RadioTrack {
+interface MusicTrack {
   id: string;
   name: string;
   station: string;
   url: string;
 }
 
-const RadioPlayer: React.FC<RadioPlayerProps> = ({ isActive, onTrackChange }) => {
-  const [currentTrack] = useState<RadioTrack>({
+const MusicPlayer: React.FC<MusicPlayerProps> = ({ isActive, onTrackChange }) => {
+  const [currentTrack] = useState<MusicTrack>({
     id: 'lofi-hip-hop',
     name: 'Lofi Hip Hop Radio',
     station: 'Beats to Relax/Study To',
@@ -30,9 +30,9 @@ const RadioPlayer: React.FC<RadioPlayerProps> = ({ isActive, onTrackChange }) =>
   if (!isActive) return null;
 
   return (
-    <div className="radio-player">
+    <div className="music-player">
       <div className="player-section">
-        <h3>🎵 Lofi Hip Hop Radio</h3>
+        <h3>🎵 Lofi Hip Hop YouTube</h3>
         
         {/* Current Station Display */}
         <div className="current-station">
@@ -56,7 +56,7 @@ const RadioPlayer: React.FC<RadioPlayerProps> = ({ isActive, onTrackChange }) =>
           />
         </div>
         
-        <div className="radio-info">
+        <div className="music-info">
           <p>🎵 Disfruta de música lofi durante tus sesiones de Pomodoro</p>
         </div>
       </div>
@@ -64,4 +64,4 @@ const RadioPlayer: React.FC<RadioPlayerProps> = ({ isActive, onTrackChange }) =>
   );
 };
 
-export default RadioPlayer;
+export default MusicPlayer;

@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './App.css';
-import RadioPlayer from './SpotifyPlayer';
+import MusicPlayer from './SpotifyPlayer';
 
-interface RadioTrack {
+interface MusicTrack {
   id: string;
   name: string;
   station: string;
@@ -16,7 +16,7 @@ interface PomodoroState {
   mode: 'work' | 'shortBreak' | 'longBreak';
   session: number;
   musicEnabled: boolean;
-  currentTrack: RadioTrack | null;
+  currentTrack: MusicTrack | null;
 }
 
 const TIMER_MODES = {
@@ -103,7 +103,7 @@ function App() {
     }));
   };
 
-  const handleTrackChange = (track: RadioTrack) => {
+  const handleTrackChange = (track: MusicTrack) => {
     setState(prev => ({
       ...prev,
       currentTrack: track
@@ -230,14 +230,14 @@ function App() {
             <button
               className={`music-btn ${state.musicEnabled ? 'active' : ''}`}
               onClick={toggleMusic}
-              title={state.musicEnabled ? 'Desactivar Radio' : 'Activar Radio'}
-            >
-              {state.musicEnabled ? '📻 Radio ON' : '🔇 Radio OFF'}
+              title={state.musicEnabled ? 'Desactivar Música' : 'Activar Música'}
+             >
+               {state.musicEnabled ? '🎵 Música ON' : '🔇 Música OFF'}
             </button>
           </div>
 
           {state.musicEnabled && (
-             <RadioPlayer
+             <MusicPlayer
                isActive={state.isActive}
                onTrackChange={handleTrackChange}
              />
