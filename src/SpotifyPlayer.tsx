@@ -53,6 +53,86 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ isActive, onTrackChange }) =>
   const [isLoading, setIsLoading] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
 
+  // Declarar funciones con useCallback antes de usarlas en useEffect
+  const loadPlaylistTracks = useCallback(async (token: string, playlistId: string) => {
+    try {
+      const response = await fetch(`https://api.spotify.com/v1/playlists/${playlistId}/tracks?limit=50`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        const tracks = data.items
+          .map((item: SpotifyPlaylistItem) => item.track)
+          .filter((track: SpotifyTrack) => track && track.preview_url);
+        
+        if (tracks.length > 0) {
+          const randomTrack = tracks[Math.floor(Math.random() * tracks.length)];
+          setCurrentTrack(randomTrack);
+          onTrackChange({
+            id: randomTrack.id,
+            name: randomTrack.name,
+            station: randomTrack.artists[0]?.name || 'Spotify',
+            url: randomTrack.preview_url || ''
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Error loading playlist tracks:', error);
+    }
+  }, [onTrackChange]);
+
+  const loadUserPlaylists = useCallback(async (token: string) => {
+    try {
+      setIsLoading(true);
+      const response = await fetch('https://api.spotify.com/v1/me/playlists?limit=20', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setPlaylists(data.items || []);
+        
+        // Cargar playlist de concentración por defecto
+        const focusPlaylist = data.items.find((playlist: SpotifyPlaylist) => 
+          playlist.name.toLowerCase().includes('focus') || 
+          playlist.name.toLowerCase().includes('concentra') ||
+          playlist.name.toLowerCase().includes('study')
+        );
+        
+        if (focusPlaylist) {
+          loadPlaylistTracks(token, focusPlaylist.id);
+        }
+      }
+    } catch (error) {
+      console.error('Error loading playlists:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [loadPlaylistTracks]);
+
+  const playTrack = useCallback(async () => {
+    if (audioRef.current && currentTrack?.preview_url) {
+      try {
+        await audioRef.current.play();
+        setIsPlaying(true);
+      } catch (error) {
+        console.warn('Autoplay blocked:', error);
+      }
+    }
+  }, [currentTrack]);
+
+  const pauseTrack = useCallback(() => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      setIsPlaying(false);
+    }
+  }, []);
+
   // Verificar autenticación al cargar
   useEffect(() => {
     const token = localStorage.getItem('spotify_access_token');
@@ -112,66 +192,7 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ isActive, onTrackChange }) =>
     window.location.href = authUrl;
   };
 
-  const loadUserPlaylists = useCallback(async (token: string) => {
-    try {
-      setIsLoading(true);
-      const response = await fetch('https://api.spotify.com/v1/me/playlists?limit=20', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
 
-      if (response.ok) {
-        const data = await response.json();
-        setPlaylists(data.items || []);
-        
-        // Cargar playlist de concentración por defecto
-        const focusPlaylist = data.items.find((playlist: SpotifyPlaylist) => 
-          playlist.name.toLowerCase().includes('focus') || 
-          playlist.name.toLowerCase().includes('concentra') ||
-          playlist.name.toLowerCase().includes('study')
-        );
-        
-        if (focusPlaylist) {
-          loadPlaylistTracks(token, focusPlaylist.id);
-        }
-      }
-    } catch (error) {
-      console.error('Error loading playlists:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  const loadPlaylistTracks = async (token: string, playlistId: string) => {
-    try {
-      const response = await fetch(`https://api.spotify.com/v1/playlists/${playlistId}/tracks?limit=50`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        const tracks = data.items
-          .map((item: SpotifyPlaylistItem) => item.track)
-          .filter((track: SpotifyTrack) => track && track.preview_url);
-        
-        if (tracks.length > 0) {
-          const randomTrack = tracks[Math.floor(Math.random() * tracks.length)];
-          setCurrentTrack(randomTrack);
-          onTrackChange({
-            id: randomTrack.id,
-            name: randomTrack.name,
-            station: randomTrack.artists[0]?.name || 'Spotify',
-            url: randomTrack.preview_url || ''
-          });
-        }
-      }
-    } catch (error) {
-      console.error('Error loading playlist tracks:', error);
-    }
-  };
 
   const searchTracks = async (query: string) => {
     if (!accessToken || !query.trim()) {
@@ -217,23 +238,7 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ isActive, onTrackChange }) =>
     });
   };
 
-  const playTrack = useCallback(async () => {
-    if (audioRef.current && currentTrack?.preview_url) {
-      try {
-        await audioRef.current.play();
-        setIsPlaying(true);
-      } catch (error) {
-        console.warn('Autoplay blocked:', error);
-      }
-    }
-  }, [currentTrack]);
 
-  const pauseTrack = useCallback(() => {
-    if (audioRef.current) {
-      audioRef.current.pause();
-      setIsPlaying(false);
-    }
-  }, []);
 
   const togglePlayPause = () => {
     if (isPlaying) {
