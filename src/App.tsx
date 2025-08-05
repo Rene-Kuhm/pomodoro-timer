@@ -141,6 +141,11 @@ function App() {
 
   return (
     <div className="app" style={{ '--primary-color': currentMode.color } as React.CSSProperties}>
+      {/* Efectos de fondo mejorados */}
+      <div className="neon-overlay"></div>
+      <div className="depth-shadows"></div>
+      <div className="dynamic-lights"></div>
+      
       {/* Header con logo y contadores */}
       <header className="top-header">
         <div className="logo">rene</div>
