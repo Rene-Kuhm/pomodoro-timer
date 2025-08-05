@@ -171,35 +171,7 @@ body::after {
   background: rgba(255, 255, 255, 0.1);
 }
 
-/* Contenedor de ilustración */
-.artwork-container {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 600px;
-  height: 600px;
-  z-index: 1;
-  opacity: 0.3;
-}
-
-.woman-illustration {
-  width: 100%;
-  height: 100%;
-  position: relative;
-}
-
-.woman-svg {
-  width: 100%;
-  height: 100%;
-  filter: drop-shadow(0 0 30px rgba(255, 255, 255, 0.2));
-  animation: float 6s ease-in-out infinite;
-}
-
-@keyframes float {
-  0%, 100% { transform: translateY(0px) rotate(0deg); }
-  50% { transform: translateY(-20px) rotate(2deg); }
-}
+/* Contenedor de ilustración eliminado para un fondo más limpio */
 
 /* Timer principal */
 .main-timer {

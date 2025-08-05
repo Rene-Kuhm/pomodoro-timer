@@ -166,40 +166,7 @@ function App() {
         <button className="menu-btn">☰</button>
       </header>
 
-      {/* Ilustración artística */}
-      <div className="artwork-container">
-        <div className="woman-illustration">
-          {/* SVG de la mujer artística */}
-          <svg viewBox="0 0 400 400" className="woman-svg">
-            <defs>
-              <linearGradient id="hairGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#667eea" />
-                <stop offset="30%" stopColor="#764ba2" />
-                <stop offset="60%" stopColor="#f093fb" />
-                <stop offset="100%" stopColor="#f5576c" />
-              </linearGradient>
-              <linearGradient id="faceGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#4facfe" />
-                <stop offset="100%" stopColor="#00f2fe" />
-              </linearGradient>
-            </defs>
-            {/* Cabello */}
-            <path d="M80 120 Q60 80 100 60 Q140 40 180 50 Q220 45 260 70 Q300 90 320 130 Q340 170 320 210 Q300 250 280 280 Q250 300 220 290 Q190 285 160 280 Q130 270 100 250 Q80 220 70 180 Q65 150 80 120 Z" fill="url(#hairGradient)" />
-            {/* Cara */}
-            <ellipse cx="200" cy="180" rx="60" ry="80" fill="url(#faceGradient)" opacity="0.9" />
-            {/* Ojos */}
-            <ellipse cx="185" cy="165" rx="8" ry="12" fill="#2c3e50" />
-            <ellipse cx="215" cy="165" rx="8" ry="12" fill="#2c3e50" />
-            {/* Pestañas */}
-            <path d="M175 155 Q180 150 185 155" stroke="#2c3e50" strokeWidth="2" fill="none" />
-            <path d="M215 155 Q220 150 225 155" stroke="#2c3e50" strokeWidth="2" fill="none" />
-            {/* Nariz */}
-            <path d="M200 175 L195 185 L205 185 Z" fill="rgba(255,255,255,0.3)" />
-            {/* Labios */}
-            <ellipse cx="200" cy="195" rx="12" ry="6" fill="#e74c3c" opacity="0.7" />
-          </svg>
-        </div>
-      </div>
+
 
       {/* Timer principal */}
       <div className="main-timer">
