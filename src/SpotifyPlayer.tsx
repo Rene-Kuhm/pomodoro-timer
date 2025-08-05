@@ -12,44 +12,174 @@ interface MusicTrack {
   cover?: string;
 }
 
-// Música lofi predeterminada
-const DEFAULT_LOFI_TRACKS: MusicTrack[] = [
+// Listas de música organizadas por categorías
+const FOCUS_TRACKS: MusicTrack[] = [
   {
-    id: 'default-1',
-    name: 'Chill Lofi Beat',
-    artist: 'Lofi Generator',
-    url: 'https://cdn.pixabay.com/audio/2022/05/27/audio_1808fbf07a.mp3',
-    cover: '🎵'
+    id: 'focus-1',
+    name: 'Deep Focus',
+    artist: 'Concentration Beats',
+    url: 'https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3',
+    cover: '🧠'
   },
   {
-    id: 'default-2',
-    name: 'Peaceful Study',
-    artist: 'Focus Beats',
-    url: 'https://cdn.pixabay.com/audio/2022/03/10/audio_4621777a14.mp3',
-    cover: '🎧'
+    id: 'focus-2',
+    name: 'Study Session',
+    artist: 'Academic Vibes',
+    url: 'https://file-examples.com/storage/fe68c9fa7d66f447a9512b4/2017/11/file_example_MP3_700KB.mp3',
+    cover: '📚'
   },
   {
-    id: 'default-3',
-    name: 'Ambient Workspace',
-    artist: 'Productivity Sounds',
-    url: 'https://cdn.pixabay.com/audio/2022/01/18/audio_7203346d8a.mp3',
-    cover: '🎼'
+    id: 'focus-3',
+    name: 'Productivity Flow',
+    artist: 'Work Beats',
+    url: 'https://www.soundjay.com/misc/sounds/bell-ringing-05.wav',
+    cover: '⚡'
   },
   {
-    id: 'default-4',
-    name: 'Dreamy Lofi',
-    artist: 'Chill Vibes',
-    url: 'https://cdn.pixabay.com/audio/2021/08/04/audio_0625c1539c.mp3',
+    id: 'focus-4',
+    name: 'Mental Clarity',
+    artist: 'Clear Mind',
+    url: 'https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3',
+    cover: '💡'
+  },
+  {
+    id: 'focus-5',
+    name: 'Concentration Zone',
+    artist: 'Focus Factory',
+    url: 'https://file-examples.com/storage/fe68c9fa7d66f447a9512b4/2017/11/file_example_MP3_700KB.mp3',
+    cover: '🎯'
+  }
+];
+
+const CHILL_TRACKS: MusicTrack[] = [
+  {
+    id: 'chill-1',
+    name: 'Sunset Lofi',
+    artist: 'Evening Vibes',
+    url: 'https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3',
+    cover: '🌅'
+  },
+  {
+    id: 'chill-2',
+    name: 'Rainy Day',
+    artist: 'Cozy Sounds',
+    url: 'https://file-examples.com/storage/fe68c9fa7d66f447a9512b4/2017/11/file_example_MP3_700KB.mp3',
+    cover: '🌧️'
+  },
+  {
+    id: 'chill-3',
+    name: 'Coffee Shop',
+    artist: 'Café Ambience',
+    url: 'https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3',
+    cover: '☕'
+  },
+  {
+    id: 'chill-4',
+    name: 'Night Walk',
+    artist: 'Midnight Stroll',
+    url: 'https://file-examples.com/storage/fe68c9fa7d66f447a9512b4/2017/11/file_example_MP3_700KB.mp3',
     cover: '🌙'
   },
   {
-    id: 'default-5',
-    name: 'Coffee Shop Vibes',
-    artist: 'Study Music',
-    url: 'https://cdn.pixabay.com/audio/2022/08/02/audio_884fe92c21.mp3',
-    cover: '☕'
+    id: 'chill-5',
+    name: 'Lazy Sunday',
+    artist: 'Weekend Vibes',
+    url: 'https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3',
+    cover: '😌'
   }
 ];
+
+const NATURE_TRACKS: MusicTrack[] = [
+  {
+    id: 'nature-1',
+    name: 'Forest Sounds',
+    artist: 'Nature Recordings',
+    url: 'https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3',
+    cover: '🌲'
+  },
+  {
+    id: 'nature-2',
+    name: 'Ocean Waves',
+    artist: 'Seaside Sounds',
+    url: 'https://file-examples.com/storage/fe68c9fa7d66f447a9512b4/2017/11/file_example_MP3_700KB.mp3',
+    cover: '🌊'
+  },
+  {
+    id: 'nature-3',
+    name: 'Mountain Breeze',
+    artist: 'Alpine Audio',
+    url: 'https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3',
+    cover: '⛰️'
+  },
+  {
+    id: 'nature-4',
+    name: 'Bird Songs',
+    artist: 'Wildlife Sounds',
+    url: 'https://file-examples.com/storage/fe68c9fa7d66f447a9512b4/2017/11/file_example_MP3_700KB.mp3',
+    cover: '🐦'
+  },
+  {
+    id: 'nature-5',
+    name: 'Thunderstorm',
+    artist: 'Storm Sounds',
+    url: 'https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3',
+    cover: '⛈️'
+  }
+];
+
+const AMBIENT_TRACKS: MusicTrack[] = [
+  {
+    id: 'ambient-1',
+    name: 'Space Drift',
+    artist: 'Cosmic Sounds',
+    url: 'https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3',
+    cover: '🚀'
+  },
+  {
+    id: 'ambient-2',
+    name: 'Meditation Flow',
+    artist: 'Zen Masters',
+    url: 'https://file-examples.com/storage/fe68c9fa7d66f447a9512b4/2017/11/file_example_MP3_700KB.mp3',
+    cover: '🧘'
+  },
+  {
+    id: 'ambient-3',
+    name: 'Digital Dreams',
+    artist: 'Synth Wave',
+    url: 'https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3',
+    cover: '💻'
+  },
+  {
+    id: 'ambient-4',
+    name: 'Crystal Healing',
+    artist: 'Healing Frequencies',
+    url: 'https://file-examples.com/storage/fe68c9fa7d66f447a9512b4/2017/11/file_example_MP3_700KB.mp3',
+    cover: '💎'
+  },
+  {
+    id: 'ambient-5',
+    name: 'Ethereal Voices',
+    artist: 'Angelic Choir',
+    url: 'https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3',
+    cover: '👼'
+  }
+];
+
+// Lista principal que combina todas las categorías
+const DEFAULT_LOFI_TRACKS: MusicTrack[] = [
+  ...FOCUS_TRACKS,
+  ...CHILL_TRACKS,
+  ...NATURE_TRACKS,
+  ...AMBIENT_TRACKS
+];
+
+// Categorías de playlists
+const PLAYLIST_CATEGORIES = {
+  focus: { name: 'Concentración', tracks: FOCUS_TRACKS, icon: '🧠' },
+  chill: { name: 'Relajación', tracks: CHILL_TRACKS, icon: '😌' },
+  nature: { name: 'Naturaleza', tracks: NATURE_TRACKS, icon: '🌿' },
+  ambient: { name: 'Ambiental', tracks: AMBIENT_TRACKS, icon: '🌌' }
+};
 
 const MusicPlayer: React.FC<MusicPlayerProps> = ({ onTrackChange }) => {
   const [currentTrack, setCurrentTrack] = useState<MusicTrack | null>(null);
@@ -60,6 +190,8 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ onTrackChange }) => {
   const [isPlayerVisible, setIsPlayerVisible] = useState(true);
   const [tracks, setTracks] = useState<MusicTrack[]>(DEFAULT_LOFI_TRACKS);
   const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
+  const [selectedCategory, setSelectedCategory] = useState<string>('focus');
+  const [showCategories, setShowCategories] = useState(false);
   
   const audioRef = useRef<HTMLAudioElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -117,6 +249,17 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ onTrackChange }) => {
       }
     }
   }, [isPlaying, currentTrack]);
+
+  // Actualizar pistas cuando cambie la categoría
+  useEffect(() => {
+    const categoryData = PLAYLIST_CATEGORIES[selectedCategory as keyof typeof PLAYLIST_CATEGORIES];
+    if (categoryData) {
+      setTracks(categoryData.tracks);
+      setCurrentTrackIndex(0);
+      setCurrentTrack(null);
+      setIsPlaying(false);
+    }
+  }, [selectedCategory]);
 
   const togglePlayPause = useCallback(() => {
     if (audioRef.current) {
@@ -198,6 +341,15 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ onTrackChange }) => {
     }
   };
 
+  const changeCategory = (category: string) => {
+    setSelectedCategory(category);
+    setShowCategories(false);
+  };
+
+  const toggleCategorySelector = () => {
+    setShowCategories(!showCategories);
+  };
+
   const formatTime = (time: number) => {
     const minutes = Math.floor(time / 60);
     const seconds = Math.floor(time % 60);
@@ -247,6 +399,34 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ onTrackChange }) => {
             >
               ➖
             </button>
+          </div>
+
+          {/* Category Selector */}
+          <div className="category-section">
+            <button 
+              className="category-selector-btn"
+              onClick={toggleCategorySelector}
+            >
+              {PLAYLIST_CATEGORIES[selectedCategory as keyof typeof PLAYLIST_CATEGORIES]?.icon} 
+              {PLAYLIST_CATEGORIES[selectedCategory as keyof typeof PLAYLIST_CATEGORIES]?.name}
+              <span className="dropdown-arrow">{showCategories ? '▲' : '▼'}</span>
+            </button>
+            
+            {showCategories && (
+              <div className="category-dropdown">
+                {Object.entries(PLAYLIST_CATEGORIES).map(([key, category]) => (
+                  <button
+                    key={key}
+                    className={`category-option ${selectedCategory === key ? 'active' : ''}`}
+                    onClick={() => changeCategory(key)}
+                  >
+                    <span className="category-icon">{category.icon}</span>
+                    <span className="category-name">{category.name}</span>
+                    <span className="track-count">({category.tracks.length})</span>
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Current Track Display */}
@@ -564,6 +744,94 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ onTrackChange }) => {
 
         .add-music-btn:hover {
           background: rgba(255, 255, 255, 0.2);
+        }
+
+        .category-section {
+          margin-bottom: 15px;
+          position: relative;
+        }
+
+        .category-selector-btn {
+          width: 100%;
+          background: rgba(255, 255, 255, 0.1);
+          border: 1px solid rgba(255, 255, 255, 0.2);
+          border-radius: 12px;
+          padding: 10px 15px;
+          color: white;
+          font-size: 14px;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          backdrop-filter: blur(10px);
+        }
+
+        .category-selector-btn:hover {
+          background: rgba(255, 255, 255, 0.15);
+          border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .dropdown-arrow {
+          font-size: 12px;
+          transition: transform 0.3s ease;
+        }
+
+        .category-dropdown {
+          position: absolute;
+          top: 100%;
+          left: 0;
+          right: 0;
+          background: rgba(0, 0, 0, 0.9);
+          backdrop-filter: blur(20px);
+          border: 1px solid rgba(255, 255, 255, 0.2);
+          border-radius: 12px;
+          margin-top: 5px;
+          z-index: 1000;
+          overflow: hidden;
+          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .category-option {
+          width: 100%;
+          background: transparent;
+          border: none;
+          padding: 12px 15px;
+          color: white;
+          font-size: 13px;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .category-option:last-child {
+          border-bottom: none;
+        }
+
+        .category-option:hover {
+          background: rgba(255, 255, 255, 0.1);
+        }
+
+        .category-option.active {
+          background: rgba(255, 255, 255, 0.15);
+          border-left: 3px solid #4CAF50;
+        }
+
+        .category-icon {
+          font-size: 16px;
+        }
+
+        .category-name {
+          flex: 1;
+          text-align: left;
+        }
+
+        .track-count {
+          font-size: 11px;
+          opacity: 0.7;
         }
 
         .tracks {
