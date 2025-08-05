@@ -1,63 +1,59 @@
-# Configuración de Spotify para Pomodoro App
+# Configuración de Spotify
 
-Para usar la funcionalidad de Spotify en tu aplicación Pomodoro, necesitas configurar una aplicación en Spotify Developer Dashboard.
+## Configuración Completa de la Aplicación Spotify
 
-## Pasos para configurar Spotify:
+### 1. Información de la Aplicación
+- **App name**: Pomodoro Timer
+- **App description**: Aplicación Pomodoro con integración de Spotify
+- **Website**: `https://pomodoro-timer-psi-one.vercel.app/`
 
-### 1. Crear una aplicación en Spotify Developer Dashboard
+### 2. Redirect URIs (IMPORTANTE)
+Agrega estas dos URIs en tu Spotify Dashboard:
+- `https://localhost:5173/callback` (para desarrollo local)
+- `https://pomodoro-timer-psi-one.vercel.app/callback` (para producción)
 
-1. Ve a [Spotify Developer Dashboard](https://developer.spotify.com/dashboard)
-2. Inicia sesión con tu cuenta de Spotify
-3. Haz clic en "Create an App"
-4. Completa los campos:
-   - **App name**: Pomodoro Timer
-   - **App description**: Aplicación Pomodoro con integración de Spotify
-   - **Website**: http://localhost:5173 (para desarrollo)
-   - **Redirect URI**: http://localhost:5173/callback
-5. Acepta los términos y condiciones
-6. Haz clic en "Create"
+### 3. APIs Utilizadas
+- Web API
+- Web Playback SDK
 
-### 2. Obtener las credenciales
+### 4. Pasos de Configuración
 
-1. En el dashboard de tu aplicación, encontrarás:
-   - **Client ID**: Copia este valor
-   - **Client Secret**: No lo necesitas para esta implementación
+1. **Crear aplicación en Spotify**:
+   - Ve a [Spotify Developer Dashboard](https://developer.spotify.com/dashboard)
+   - Crea una nueva aplicación con la información de arriba
+   - Copia el Client ID
 
-### 3. Configurar la aplicación
+2. **Configurar variables de entorno**:
+   - Crea un archivo `.env` en la raíz del proyecto
+   - Agrega: `VITE_SPOTIFY_CLIENT_ID=tu_client_id_aqui`
 
-**Opción A: Usando variables de entorno (Recomendado)**
-1. Copia el archivo `.env.example` a `.env`:
-   ```bash
-   cp .env.example .env
-   ```
-2. Abre el archivo `.env` y reemplaza `your_spotify_client_id_here` con tu Client ID real
-3. Reinicia el servidor de desarrollo (`npm run dev`)
+3. **Configurar Redirect URIs**:
+   - En el dashboard de Spotify, ve a "Settings"
+   - Agrega ambas URIs de redirección mencionadas arriba
+   - Guarda los cambios
 
-**Opción B: Directamente en el código**
-1. Abre el archivo `src/SpotifyPlayer.tsx`
-2. Busca la línea que dice:
-   ```typescript
-   const CLIENT_ID = import.meta.env.VITE_SPOTIFY_CLIENT_ID || 'your_spotify_client_id';
-   ```
-3. Reemplaza `'your_spotify_client_id'` con tu Client ID real de Spotify
+### 5. Funcionalidades Disponibles
+- ✅ Autenticación OAuth automática
+- ✅ Detección automática de entorno (desarrollo/producción)
+- ✅ Búsqueda de música
+- ✅ Reproducción de previews
+- ✅ Visualización de playlists
+- ✅ Control básico de reproducción
+- ✅ Gestión de tokens con expiración
+- ✅ Callback handling con React Router
 
-### 4. Configurar Redirect URI
+### 6. Flujo de Autenticación
+1. Usuario hace clic en "Conectar con Spotify"
+2. Redirección a Spotify para autorización
+3. Spotify redirige a `/callback` con el token
+4. Token se guarda en localStorage con expiración
+5. Usuario regresa a la aplicación principal
+6. Aplicación usa el token para hacer requests a la API
 
-1. En el dashboard de Spotify, ve a "Settings"
-2. En "Redirect URIs", agrega:
-   - `http://localhost:5173/callback`
-   - `http://localhost:5173` (opcional)
-3. Guarda los cambios
-
-## Funcionalidades disponibles:
-
-- ✅ Autenticación con Spotify
-- ✅ Búsqueda de canciones
-- ✅ Visualización de playlists del usuario
-- ✅ Reproducción de previews de 30 segundos
-- ✅ Control de reproducción (play/pause)
-- ✅ Integración con el temporizador Pomodoro
-- ✅ Interfaz moderna y responsive
+### 7. Estructura de Archivos
+- `src/SpotifyPlayer.tsx` - Componente principal de Spotify
+- `src/SpotifyCallback.tsx` - Manejo del callback de autenticación
+- `src/main.tsx` - Configuración de rutas con React Router
 
 ## Limitaciones:
 

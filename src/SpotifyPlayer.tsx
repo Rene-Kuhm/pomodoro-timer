@@ -40,7 +40,13 @@ const SpotifyPlayer: React.FC<SpotifyPlayerProps> = ({ isActive, onTrackChange }
 
   // Spotify App credentials (you'll need to register your app)
   const CLIENT_ID = import.meta.env.VITE_SPOTIFY_CLIENT_ID || 'your_spotify_client_id'; // Replace with your actual client ID
-  const REDIRECT_URI = 'https://localhost:5173/callback';
+  
+  // Detect environment and set appropriate redirect URI
+  const isProduction = window.location.hostname !== 'localhost';
+  const REDIRECT_URI = isProduction 
+    ? 'https://pomodoro-timer-psi-one.vercel.app/callback'
+    : 'https://localhost:5173/callback';
+  
   const SCOPES = 'user-read-private user-read-email playlist-read-private user-library-read';
 
   // Authentication
@@ -54,24 +60,29 @@ const SpotifyPlayer: React.FC<SpotifyPlayerProps> = ({ isActive, onTrackChange }
     window.location.href = authUrl;
   };
 
-  // Extract token from URL after redirect
+  // Check for existing token and validate it
   useEffect(() => {
-    const hash = window.location.hash;
-    if (hash) {
-      const token = hash.substring(1).split('&').find(elem => elem.startsWith('access_token'))?.split('=')[1];
-      if (token) {
-        setAccessToken(token);
-        setIsAuthenticated(true);
-        window.location.hash = '';
-        localStorage.setItem('spotify_token', token);
+    const checkToken = async () => {
+      const savedToken = localStorage.getItem('spotify_access_token');
+      const tokenExpiration = localStorage.getItem('spotify_token_expiration');
+      
+      if (savedToken && tokenExpiration) {
+        const now = Date.now();
+        const expiration = parseInt(tokenExpiration);
+        
+        if (now < expiration) {
+          // Token is still valid
+          setAccessToken(savedToken);
+          setIsAuthenticated(true);
+        } else {
+          // Token expired, clear it
+          localStorage.removeItem('spotify_access_token');
+          localStorage.removeItem('spotify_token_expiration');
+        }
       }
-    } else {
-      const savedToken = localStorage.getItem('spotify_token');
-      if (savedToken) {
-        setAccessToken(savedToken);
-        setIsAuthenticated(true);
-      }
-    }
+    };
+    
+    checkToken();
   }, []);
 
   // Search tracks
