@@ -17,7 +17,7 @@ const RadioPlayer: React.FC<RadioPlayerProps> = ({ isActive, onTrackChange }) =>
     id: 'lofi-hip-hop',
     name: 'Lofi Hip Hop Radio',
     station: 'Beats to Relax/Study To',
-    url: 'https://www.youtube.com/embed/5qap5aO4i9A?autoplay=1'
+    url: 'https://www.youtube.com/embed/jfKfPfyJRdk?autoplay=1'
   });
 
   // Notify parent component about the current track when component mounts
