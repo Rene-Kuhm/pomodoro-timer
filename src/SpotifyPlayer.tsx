@@ -54,6 +54,58 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ isActive, onTrackChange }) =>
   const audioRef = useRef<HTMLAudioElement>(null);
 
   // Declarar funciones con useCallback antes de usarlas en useEffect
+  const searchLofiTracks = useCallback(async () => {
+    if (!accessToken) return;
+
+    try {
+      setIsLoading(true);
+      const lofiQueries = [
+        'lofi hip hop chill',
+        'lofi study music',
+        'chill beats',
+        'ambient lofi',
+        'relaxing instrumental'
+      ];
+      
+      const randomQuery = lofiQueries[Math.floor(Math.random() * lofiQueries.length)];
+      
+      const response = await fetch(
+        `https://api.spotify.com/v1/search?q=${encodeURIComponent(randomQuery)}&type=track&limit=20`,
+        {
+          headers: {
+            'Authorization': `Bearer ${accessToken}`
+          }
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        const tracksWithPreview = data.tracks.items.filter(
+          (track: SpotifyTrack) => track.preview_url
+        );
+        setSearchResults(tracksWithPreview);
+        console.log(`Encontradas ${tracksWithPreview.length} canciones lofi con vista previa`);
+        
+        // Seleccionar automáticamente una canción si se encontraron resultados
+        if (tracksWithPreview.length > 0 && !currentTrack) {
+          const randomTrack = tracksWithPreview[Math.floor(Math.random() * tracksWithPreview.length)];
+          setCurrentTrack(randomTrack);
+          onTrackChange({
+            id: randomTrack.id,
+            name: randomTrack.name,
+            station: randomTrack.artists[0]?.name || 'Spotify',
+            url: randomTrack.preview_url || ''
+          });
+          console.log(`Canción seleccionada automáticamente: ${randomTrack.name} - ${randomTrack.artists[0]?.name}`);
+        }
+      }
+    } catch (error) {
+      console.error('Error searching lofi tracks:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [accessToken, currentTrack, onTrackChange]);
+
   const loadPlaylistTracks = useCallback(async (token: string, playlistId: string) => {
     try {
       const response = await fetch(`https://api.spotify.com/v1/playlists/${playlistId}/tracks?limit=50`, {
@@ -209,57 +261,6 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ isActive, onTrackChange }) =>
     }
   }, [loadUserPlaylists]);
 
-  const searchLofiTracks = useCallback(async () => {
-    if (!accessToken) return;
-
-    try {
-      setIsLoading(true);
-      const lofiQueries = [
-        'lofi hip hop chill',
-        'lofi study music',
-        'chill beats',
-        'ambient lofi',
-        'relaxing instrumental'
-      ];
-      
-      const randomQuery = lofiQueries[Math.floor(Math.random() * lofiQueries.length)];
-      
-      const response = await fetch(
-        `https://api.spotify.com/v1/search?q=${encodeURIComponent(randomQuery)}&type=track&limit=20`,
-        {
-          headers: {
-            'Authorization': `Bearer ${accessToken}`
-          }
-        }
-      );
-
-      if (response.ok) {
-        const data = await response.json();
-        const tracksWithPreview = data.tracks.items.filter(
-          (track: SpotifyTrack) => track.preview_url
-        );
-        setSearchResults(tracksWithPreview);
-        console.log(`Encontradas ${tracksWithPreview.length} canciones lofi con vista previa`);
-        
-        // Seleccionar automáticamente una canción si se encontraron resultados
-        if (tracksWithPreview.length > 0 && !currentTrack) {
-          const randomTrack = tracksWithPreview[Math.floor(Math.random() * tracksWithPreview.length)];
-          setCurrentTrack(randomTrack);
-          onTrackChange({
-            id: randomTrack.id,
-            name: randomTrack.name,
-            station: randomTrack.artists[0]?.name || 'Spotify',
-            url: randomTrack.preview_url || ''
-          });
-          console.log(`Canción seleccionada automáticamente: ${randomTrack.name} - ${randomTrack.artists[0]?.name}`);
-        }
-      }
-    } catch (error) {
-      console.error('Error searching lofi tracks:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [accessToken, currentTrack, onTrackChange]);
 
   // Buscar música lofi automáticamente cuando se autentica
   useEffect(() => {
