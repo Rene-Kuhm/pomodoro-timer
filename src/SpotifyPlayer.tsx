@@ -26,23 +26,28 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ isActive, onTrackChange }) =>
 
   // Auto-play when component becomes active
   useEffect(() => {
-    if (isActive) {
+    if (isActive && audioRef.current) {
       onTrackChange?.(currentTrack);
-      // Auto-start playing when music is enabled
-      setTimeout(() => {
-        if (audioRef.current) {
-          audioRef.current.play().catch(console.error);
-          setIsPlaying(true);
-        }
-      }, 500);
+      
+      // Solo reproducir si el usuario ya interactuó con la página
+      const tryPlay = () => {
+        audioRef.current?.play()
+          .then(() => setIsPlaying(true))
+          .catch(err => {
+            console.warn('Autoplay bloqueado, espera interacción del usuario.', err);
+            setIsPlaying(false);
+          });
+      };
+
+      // Llamar con pequeño delay para garantizar carga del DOM
+      setTimeout(tryPlay, 500);
     } else {
-      // Stop playing when music is disabled
       if (audioRef.current) {
         audioRef.current.pause();
         setIsPlaying(false);
       }
     }
-  }, [isActive, currentTrack, onTrackChange]);
+  }, [isActive]);
 
   // Update volume when changed
   useEffect(() => {
@@ -115,6 +120,26 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ isActive, onTrackChange }) =>
             }}
           >
             {isPlaying ? '⏸️' : '▶️'}
+          </button>
+          
+          <button 
+            onClick={() => {
+              audioRef.current?.play()
+                .then(() => setIsPlaying(true))
+                .catch(console.error);
+            }}
+            style={{
+              background: 'none',
+              border: '2px solid #007bff',
+              color: '#007bff',
+              padding: '8px 16px',
+              borderRadius: '20px',
+              cursor: 'pointer',
+              margin: '10px',
+              fontSize: '0.9rem'
+            }}
+          >
+            🎵 Iniciar música
           </button>
           
           <div className="volume-control" style={{ margin: '10px' }}>
